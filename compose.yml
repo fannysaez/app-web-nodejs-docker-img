@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: express_app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+  mariadb:
+    image: mariadb:11.3
+    container_name: mariadb
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=expressdb
+      - MYSQL_USER=expressuser
+      - MYSQL_PASSWORD=expresspass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_USER=expressuser
+      - PMA_PASSWORD=expresspass
+    ports:
+      - "8080:80"
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+volumes:
+  mariadb_data:
